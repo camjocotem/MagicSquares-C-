@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace EurosApp
@@ -14,21 +15,34 @@ namespace EurosApp
         private static Logger logger = LogManager.GetCurrentClassLogger();
         static void Main(string[] args)
         {
-            try
+            for(var i = 1; i <= 8; i++)
             {
-                AsyncContext.Run(() => MainAsync(args));
+                new Thread(delegate ()
+                {
+                    RunItr(i + 8);
+                }).Start();
             }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.InnerException);
-            }
+
+            //try
+            //{
+            //    AsyncContext.Run(() => MainAsync(args));
+            //}
+            //catch(Exception ex)
+            //{
+            //    Console.WriteLine(ex.InnerException);
+            //}
         }
         
-        static async void MainAsync(string[] args)
+        //static async void MainAsync(string[] args)
+        //{
+
+        //}
+
+        static void RunItr(int itr)
         {
             bool Success = false;
-            List<int> arr = new List<int> {1,1,1,1,1,1,1,1,1};
-            List<int> inputs = new List<int> {1,2};
+            List<int> arr = new List<int> {itr,8,7,6,5,4,3,2,1};
+            List<int> inputs = Enumerable.Range(1,605).ToList();
             while (!Success)
             {
                 arr = MagicNumberGenerator.Cartesian(arr, inputs, null);
@@ -36,8 +50,8 @@ namespace EurosApp
                 {
                     Success = true; //Stop processing
                 }
-                Console.WriteLine("Attempting with with " + string.Join(",", arr));
-                var res = await MagicNumberGenerator.GetMagicNums(arr);
+                //Console.WriteLine("Attempting with with " + string.Join(",", arr));
+                var res = MagicNumberGenerator.GetMagicNums(arr);
                 if (res.Success)
                 {
                     Success = true;
@@ -58,9 +72,10 @@ public class MagicResult
 
 public static class MagicNumberGenerator{
 
-    public static async Task<MagicResult> GetMagicNums(List<int> arr)
+    public static MagicResult GetMagicNums(List<int> arr)
     {
-        return await Task.Run(() => CalcMagicSquare(arr));
+        //return await Task.Run(() => CalcMagicSquare(arr));
+        return CalcMagicSquare(arr);
     }
 
     public static List<int> Cartesian(List<int> startingArray, List<int> inputs, int? currentColumn)
